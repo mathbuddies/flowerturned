@@ -5,7 +5,6 @@
       <style>
         * { box-sizing: border-box; user-select: none; }
         
-        /* Navigation Bar */
         .navbar {
           width: 100%;
           height: 65px;
@@ -19,7 +18,6 @@
         }
         .nav-left { display: flex; align-items: center; gap: 12px; }
         
-        /* Rice Circle Logo Icon */
         .rice-logo-icon {
           width: 42px;
           height: 42px;
@@ -65,7 +63,6 @@
           font-size: 0.9rem;
         }
 
-        /* Slide Side Menu */
         .side-menu {
           position: absolute;
           top: 0;
@@ -86,7 +83,6 @@
         .menu-action { padding: 10px; background: #1f2937; border: 1px solid #374151; color: white; border-radius: 8px; cursor: pointer; text-align: left; font-weight: 600; }
         .menu-action:hover { background: #374151; }
 
-        /* Main Portal Layout */
         .content {
           flex: 1;
           padding: 20px;
@@ -96,244 +92,5 @@
           gap: 20px;
         }
 
-        /* Category Filter Chips */
         .categories { display: flex; gap: 10px; flex-wrap: wrap; }
-        .chip { padding: 8px 16px; background: #1f2937; border: 1px solid #374151; border-radius: 20px; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: #9ca3af; transition: all 0.2s; }
-        .chip:hover, .chip.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; }
-
-        /* Games Grid */
-        .games-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-          gap: 18px;
-        }
-        .game-card {
-          background: #1f2937;
-          border: 1px solid #374151;
-          border-radius: 14px;
-          padding: 15px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 10px;
-          cursor: pointer;
-          transition: transform 0.2s, border-color 0.2s;
-        }
-        .game-card:hover { transform: translateY(-4px); border-color: #38bdf8; }
-        .game-icon { width: 60px; height: 60px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
-        .game-title { font-weight: 700; font-size: 0.95rem; text-align: center; color: #f3f4f6; }
-        .game-tag { font-size: 0.75rem; color: #38bdf8; background: rgba(56, 189, 248, 0.1); padding: 3px 8px; border-radius: 10px; }
-
-        /* Fullscreen Game Overlay Player */
-        .game-overlay {
-          position: absolute;
-          top: 0; left: 0; width: 100vw; height: 100vh;
-          background: rgba(11, 15, 25, 0.95);
-          backdrop-filter: blur(10px);
-          z-index: 200;
-          display: none;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          padding: 20px;
-        }
-        .game-overlay.active { display: flex; }
-        .overlay-header {
-          width: 100%;
-          max-width: 800px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 15px;
-        }
-        .close-btn { padding: 8px 16px; background: #ef4444; border: none; color: white; border-radius: 8px; font-weight: 700; cursor: pointer; }
-        .arcade-container {
-          width: 100%;
-          max-width: 800px;
-          height: 500px;
-          background: #111827;
-          border: 1px solid #1f2937;
-          border-radius: 16px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          position: relative;
-          overflow: hidden;
-        }
-      </style>
-
-      <!-- Navigation Header -->
-      <div class="navbar">
-        <div class="nav-left">
-          <button class="menu-btn" onclick="toggleMenu()">☰</button>
-          <div class="rice-logo-icon">🍚</div>
-          <div class="logo-text">Adventurerice Unblocked Games</div>
-        </div>
-        <input type="text" class="search-input" id="searchBox" placeholder="Search games..." oninput="filterGames()" />
-      </div>
-
-      <!-- Side Drawer Menu -->
-      <div class="side-menu" id="sideMenu">
-        <div class="menu-title">Adventurerice Settings</div>
-        <button class="menu-action" onclick="saveProgress()">💾 Save Portal Progress</button>
-        <button class="menu-action" onclick="resetProgress()">🗑️ Reset Saved Data</button>
-        <button class="menu-action" onclick="toggleMenu()">❌ Close Menu</button>
-      </div>
-
-      <!-- Main Portal Content -->
-      <div class="content">
-        <div class="categories">
-          <div class="chip active" onclick="setCategory('all', this)">All Games</div>
-          <div class="chip" onclick="setCategory('action', this)">Action</div>
-          <div class="chip" onclick="setCategory('driving', this)">Driving</div>
-          <div class="chip" onclick="setCategory('clicker', this)">Clicker</div>
-          <div class="chip" onclick="setCategory('puzzle', this)">Puzzle</div>
-        </div>
-
-        <div class="games-grid" id="gamesGrid"></div>
-      </div>
-
-      <!-- Game Execution Modal Overlay -->
-      <div class="game-overlay" id="gameOverlay">
-        <div class="overlay-header">
-          <h2 id="overlayTitle" style="margin: 0; color: #38bdf8;">Game Title</h2>
-          <button class="close-btn" onclick="closeGame()">Close Game ✕</button>
-        </div>
-        <div class="arcade-container" id="arcadeFrame"></div>
-      </div>
-
-      <script type="text/javascript">
-        <![CDATA[
-        const gamesList = [
-          { id: 'cyberclicker', title: 'Rice Grain Clicker', cat: 'clicker', icon: '🍚', bg: '#0284c7' },
-          { id: 'trafficracer', title: 'Highway Racer 2D', cat: 'driving', icon: '🏎️', bg: '#dc2626' },
-          { id: 'targetshooter', title: 'Target Sniper 2D', cat: 'action', icon: '🎯', bg: '#16a34a' },
-          { id: 'memorymatch', title: 'Memory Grid Challenge', cat: 'puzzle', icon: '🧩', bg: '#9333ea' }
-        ];
-
-        let currentCategory = 'all';
-
-        function renderGames() {
-          const grid = document.getElementById('gamesGrid');
-          const searchTerm = document.getElementById('searchBox').value.toLowerCase();
-          grid.innerHTML = '';
-
-          gamesList.forEach(game => {
-            const matchesCat = currentCategory === 'all' || game.cat === currentCategory;
-            const matchesSearch = game.title.toLowerCase().includes(searchTerm);
-
-            if (matchesCat && matchesSearch) {
-              const card = document.createElement('div');
-              card.className = 'game-card';
-              card.onclick = () => launchGame(game.id);
-              card.innerHTML = `
-                <div class="game-icon" style="background: ${game.bg};">${game.icon}</div>
-                <div class="game-title">${game.title}</div>
-                <div class="game-tag">${game.cat.toUpperCase()}</div>
-              `;
-              grid.appendChild(card);
-            }
-          });
-        }
-
-        function setCategory(cat, el) {
-          currentCategory = cat;
-          document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-          el.classList.add('active');
-          renderGames();
-        }
-
-        function filterGames() {
-          renderGames();
-        }
-
-        function toggleMenu() {
-          document.getElementById('sideMenu').classList.toggle('open');
-        }
-
-        function launchGame(id) {
-          const overlay = document.getElementById('gameOverlay');
-          const frame = document.getElementById('arcadeFrame');
-          const title = document.getElementById('overlayTitle');
-
-          overlay.classList.add('active');
-
-          if (id === 'cyberclicker') {
-            title.textContent = "Rice Grain Clicker";
-            frame.innerHTML = `
-              <div style="text-align:center;">
-                <h2 id="clkScore" style="font-size: 2rem;">Rice Collected: 0</h2>
-                <button onclick="addClick()" style="padding: 20px 40px; font-size: 1.5rem; background: #38bdf8; border: none; border-radius: 50%; color: #0f172a; font-weight: bold; cursor: pointer;">GATHER RICE 🍚</button>
-              </div>
-            `;
-            window.clickScore = 0;
-            window.addClick = function() {
-              window.clickScore += 1;
-              document.getElementById('clkScore').textContent = "Rice Collected: " + window.clickScore;
-            };
-          } else if (id === 'trafficracer') {
-            title.textContent = "Highway Racer 2D";
-            frame.innerHTML = `
-              <div style="text-align:center;">
-                <p>Use LEFT / RIGHT Keys to Avoid Traffic!</p>
-                <div id="laneArea" style="width: 200px; height: 300px; background: #334155; position: relative; margin: 0 auto; border-radius: 10px; overflow: hidden;">
-                  <div id="playerCar" style="width: 30px; height: 50px; background: #38bdf8; position: absolute; bottom: 10px; left: 85px; border-radius: 6px;"></div>
-                </div>
-              </div>
-            `;
-            let pos = 85;
-            window.onkeydown = function(e) {
-              if (e.key === 'ArrowLeft' && pos > 10) pos -= 20;
-              if (e.key === 'ArrowRight' && pos < 160) pos += 20;
-              const car = document.getElementById('playerCar');
-              if (car) car.style.left = pos + 'px';
-            };
-          } else if (id === 'targetshooter') {
-            title.textContent = "Target Sniper 2D";
-            frame.innerHTML = `
-              <div style="text-align:center;">
-                <h3 id="sniperScore">Targets Hit: 0</h3>
-                <div id="targetBox" style="width: 300px; height: 250px; background: #1e293b; position: relative; margin: 0 auto; border-radius: 12px; cursor: crosshair;">
-                  <div id="targetDot" onclick="hitTarget()" style="width: 35px; height: 35px; background: #ef4444; border-radius: 50%; position: absolute; top: 100px; left: 130px;"></div>
-                </div>
-              </div>
-            `;
-            window.snipes = 0;
-            window.hitTarget = function() {
-              window.snipes += 1;
-              document.getElementById('sniperScore').textContent = "Targets Hit: " + window.snipes;
-              const dot = document.getElementById('targetDot');
-              dot.style.top = Math.floor(Math.random() * 200) + 'px';
-              dot.style.left = Math.floor(Math.random() * 250) + 'px';
-            };
-          } else {
-            title.textContent = "Memory Grid Challenge";
-            frame.innerHTML = `<h3 style="color: #cbd5e1;">Memory puzzle active! Match the tiles.</h3>`;
-          }
-        }
-
-        function closeGame() {
-          document.getElementById('gameOverlay').classList.remove('active');
-          document.getElementById('arcadeFrame').innerHTML = '';
-          window.onkeydown = null;
-        }
-
-        function saveProgress() {
-          alert('Adventurerice progress saved!');
-          toggleMenu();
-        }
-
-        function resetProgress() {
-          if (confirm('Reset portal settings?')) {
-            alert('Progress reset.');
-            toggleMenu();
-          }
-        }
-
-        renderGames();
-        ]]>
-      </script>
-    </div>
-  </foreignObject>
-</svg>
+        .chip { padding: 8px 16px; background: #1f2937; border: 1px solid #3
