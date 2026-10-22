@@ -93,4 +93,359 @@
         }
 
         .categories { display: flex; gap: 10px; flex-wrap: wrap; }
-        .chip { padding: 8px 16px; background: #1f2937; border: 1px solid #3
+        .chip { padding: 8px 16px; background: #1f2937; border: 1px solid #374151; border-radius: 20px; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: #9ca3af; transition: all 0.2s; }
+        .chip:hover, .chip.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; }
+
+        .games-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+          gap: 16px;
+        }
+        .game-card {
+          background: #1f2937;
+          border: 1px solid #374151;
+          border-radius: 14px;
+          padding: 14px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+          cursor: pointer;
+          transition: transform 0.2s, border-color 0.2s;
+        }
+        .game-card:hover { transform: translateY(-4px); border-color: #38bdf8; }
+        .game-icon { width: 55px; height: 55px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
+        .game-title { font-weight: 700; font-size: 0.9rem; text-align: center; color: #f3f4f6; }
+        .game-tag { font-size: 0.7rem; color: #38bdf8; background: rgba(56, 189, 248, 0.1); padding: 3px 8px; border-radius: 10px; }
+
+        .game-overlay {
+          position: absolute;
+          top: 0; left: 0; width: 100vw; height: 100vh;
+          background: rgba(11, 15, 25, 0.95);
+          backdrop-filter: blur(10px);
+          z-index: 200;
+          display: none;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 20px;
+        }
+        .game-overlay.active { display: flex; }
+        .overlay-header {
+          width: 100%;
+          max-width: 850px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+        }
+        .close-btn { padding: 8px 16px; background: #ef4444; border: none; color: white; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .arcade-container {
+          width: 100%;
+          max-width: 850px;
+          height: 520px;
+          background: #111827;
+          border: 1px solid #1f2937;
+          border-radius: 16px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          overflow: hidden;
+        }
+      </style>
+
+      <!-- Navigation Header -->
+      <div class="navbar">
+        <div class="nav-left">
+          <button class="menu-btn" onclick="toggleMenu()">☰</button>
+          <div class="rice-logo-icon">🍚</div>
+          <div class="logo-text">Adventurerice Unblocked Games</div>
+        </div>
+        <input type="text" class="search-input" id="searchBox" placeholder="Search 24 games..." oninput="filterGames()" />
+      </div>
+
+      <!-- Side Drawer Menu -->
+      <div class="side-menu" id="sideMenu">
+        <div class="menu-title">Adventurerice Settings</div>
+        <button class="menu-action" onclick="saveProgress()">💾 Save Portal Progress</button>
+        <button class="menu-action" onclick="resetProgress()">🗑️ Reset Saved Data</button>
+        <button class="menu-action" onclick="toggleMenu()">❌ Close Menu</button>
+      </div>
+
+      <!-- Main Portal Content -->
+      <div class="content">
+        <div class="categories">
+          <div class="chip active" onclick="setCategory('all', this)">All Games (24)</div>
+          <div class="chip" onclick="setCategory('action', this)">Action</div>
+          <div class="chip" onclick="setCategory('driving', this)">Driving</div>
+          <div class="chip" onclick="setCategory('clicker', this)">Clicker</div>
+          <div class="chip" onclick="setCategory('puzzle', this)">Puzzle</div>
+          <div class="chip" onclick="setCategory('shooter', this)">Shooter</div>
+        </div>
+
+        <div class="games-grid" id="gamesGrid"></div>
+      </div>
+
+      <!-- Game Execution Modal Overlay -->
+      <div class="game-overlay" id="gameOverlay">
+        <div class="overlay-header">
+          <h2 id="overlayTitle" style="margin: 0; color: #38bdf8;">Game Title</h2>
+          <button class="close-btn" onclick="closeGame()">Close Game ✕</button>
+        </div>
+        <div class="arcade-container" id="arcadeFrame"></div>
+      </div>
+
+      <script type="text/javascript">
+        <![CDATA[
+        const gamesList = [
+          { id: 'riceclicker', title: 'Rice Grain Clicker', cat: 'clicker', icon: '🍚', bg: '#0284c7' },
+          { id: 'cookieclicker', title: 'Cookie Tycoon', cat: 'clicker', icon: '🍪', bg: '#d97706' },
+          { id: 'gemminer', title: 'Gem Miner Clicker', cat: 'clicker', icon: '💎', bg: '#0284c7' },
+          { id: 'bitcoinminer', title: 'Crypto Mining Sim', cat: 'clicker', icon: '⚡', bg: '#eab308' },
+          
+          { id: 'highwayracer', title: 'Highway Racer 2D', cat: 'driving', icon: '🏎️', bg: '#dc2626' },
+          { id: 'driftking', title: 'Neon Drift Challenge', cat: 'driving', icon: '🚗', bg: '#7c3aed' },
+          { id: 'monsterdodge', title: 'Truck Obstacle Dash', cat: 'driving', icon: '🛻', bg: '#b45309' },
+          { id: 'speedboat', title: 'Hydro Boat Racing', cat: 'driving', icon: '🛥️', bg: '#2563eb' },
+
+          { id: 'targetsniper', title: 'Target Sniper 2D', cat: 'shooter', icon: '🎯', bg: '#16a34a' },
+          { id: 'spaceinvaders', title: 'Galactic Defense', cat: 'shooter', icon: '🚀', bg: '#4f46e5' },
+          { id: 'duckhunt', title: 'Retro Duck Shot', cat: 'shooter', icon: '🦆', bg: '#059669' },
+          { id: 'zombieshooter', title: 'Zombie Survival 2D', cat: 'shooter', icon: '🧟', bg: '#9f1239' },
+
+          { id: 'memorygrid', title: 'Memory Grid Pairs', cat: 'puzzle', icon: '🧩', bg: '#9333ea' },
+          { id: 'tictactoe', title: 'Tic-Tac-Toe AI', cat: 'puzzle', icon: '❌', bg: '#0891b2' },
+          { id: 'numberguesser', title: 'Number Mystery', cat: 'puzzle', icon: '🔢', bg: '#6366f1' },
+          { id: 'colorMatch', title: 'Fast Color Match', cat: 'puzzle', icon: '🎨', bg: '#db2777' },
+
+          { id: 'flappybird', title: 'Flappy Square', cat: 'action', icon: '🐤', bg: '#ca8a04' },
+          { id: 'snakegame', title: 'Classic Snake', cat: 'action', icon: '🐍', bg: '#15803d' },
+          { id: 'pongretro', title: 'Cyber Pong 2D', cat: 'action', icon: '🏓', bg: '#3b82f6' },
+          { id: 'blockjumper', title: 'Infinite Block Jump', cat: 'action', icon: '🏃', bg: '#c026d3' },
+          { id: 'whackamole', title: 'Whack-a-Mole', cat: 'action', icon: '🔨', bg: '#d97706' },
+          { id: 'reactiontest', title: 'Reaction Time Test', cat: 'action', icon: '⏱️', bg: '#475569' },
+          { id: 'meteorbreak', title: 'Brick Meteor Breaker', cat: 'action', icon: '🧱', bg: '#e11d48' },
+          { id: 'dodgeball', title: 'Dodge the Falling Balls', cat: 'action', icon: '⚽', bg: '#2563eb' }
+        ];
+
+        let currentCategory = 'all';
+
+        function renderGames() {
+          const grid = document.getElementById('gamesGrid');
+          const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+          grid.innerHTML = '';
+
+          gamesList.forEach(game => {
+            const matchesCat = currentCategory === 'all' || game.cat === currentCategory;
+            const matchesSearch = game.title.toLowerCase().includes(searchTerm);
+
+            if (matchesCat && matchesSearch) {
+              const card = document.createElement('div');
+              card.className = 'game-card';
+              card.onclick = () => launchGame(game.id);
+              card.innerHTML = `
+                <div class="game-icon" style="background: ${game.bg};">${game.icon}</div>
+                <div class="game-title">${game.title}</div>
+                <div class="game-tag">${game.cat.toUpperCase()}</div>
+              `;
+              grid.appendChild(card);
+            }
+          });
+        }
+
+        function setCategory(cat, el) {
+          currentCategory = cat;
+          document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+          el.classList.add('active');
+          renderGames();
+        }
+
+        function filterGames() {
+          renderGames();
+        }
+
+        function toggleMenu() {
+          document.getElementById('sideMenu').classList.toggle('open');
+        }
+
+        function launchGame(id) {
+          const overlay = document.getElementById('gameOverlay');
+          const frame = document.getElementById('arcadeFrame');
+          const title = document.getElementById('overlayTitle');
+
+          overlay.classList.add('active');
+          frame.innerHTML = '';
+
+          const selected = gamesList.find(g => g.id === id);
+          title.textContent = selected ? selected.title : 'Game';
+
+          if (id === 'riceclicker' || id === 'cookieclicker' || id === 'gemminer' || id === 'bitcoinminer') {
+            frame.innerHTML = `
+              <div style="text-align:center;">
+                <h2 id="clkScore" style="font-size: 2.2rem; color: #f8fafc;">Score: 0</h2>
+                <button onclick="addClick()" style="padding: 25px 45px; font-size: 2rem; background: #38bdf8; border: none; border-radius: 50%; color: #0f172a; font-weight: bold; cursor: pointer;">${selected.icon}</button>
+              </div>
+            `;
+            window.clickScore = 0;
+            window.addClick = function() {
+              window.clickScore += 1;
+              document.getElementById('clkScore').textContent = "Score: " + window.clickScore;
+            };
+          } else if (id === 'snakegame') {
+            frame.innerHTML = `<canvas id="snakeCanvas" width="400" height="400" style="background:#0f172a; border-radius:10px;"></canvas>`;
+            const canvas = document.getElementById('snakeCanvas');
+            const ctx = canvas.getContext('2d');
+            let snake = [{x: 200, y: 200}];
+            let food = {x: 100, y: 100};
+            let dx = 20, dy = 0;
+            window.gameInterval = setInterval(() => {
+              const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+              snake.unshift(head);
+              if (head.x === food.x && head.y === food.y) {
+                food = {x: Math.floor(Math.random()*19)*20, y: Math.floor(Math.random()*19)*20};
+              } else {
+                snake.pop();
+              }
+              ctx.fillStyle = '#0f172a'; ctx.fillRect(0,0,400,400);
+              ctx.fillStyle = '#ef4444'; ctx.fillRect(food.x, food.y, 18, 18);
+              ctx.fillStyle = '#22c55e';
+              snake.forEach(s => ctx.fillRect(s.x, s.y, 18, 18));
+            }, 150);
+            window.onkeydown = (e) => {
+              if (e.key==='ArrowUp' && dy===0) { dx=0; dy=-20; }
+              if (e.key==='ArrowDown' && dy===0) { dx=0; dy=20; }
+              if (e.key==='ArrowLeft' && dx===0) { dx=-20; dy=0; }
+              if (e.key==='ArrowRight' && dx===0) { dx=20; dy=0; }
+            };
+          } else if (id === 'flappybird') {
+            frame.innerHTML = `
+              <div style="text-align:center;">
+                <p style="margin-bottom:10px;">Press SPACE to Jump!</p>
+                <canvas id="flappyCanvas" width="360" height="380" style="background:#0284c7; border-radius:10px;"></canvas>
+              </div>
+            `;
+            const canvas = document.getElementById('flappyCanvas');
+            const ctx = canvas.getContext('2d');
+            let birdY = 180, velocity = 0;
+            window.gameInterval = setInterval(() => {
+              velocity += 0.5; birdY += velocity;
+              if (birdY > 356) birdY = 356;
+              if (birdY < 0) birdY = 0;
+              ctx.fillStyle = '#0284c7'; ctx.fillRect(0,0,360,380);
+              ctx.fillStyle = '#eab308'; ctx.fillRect(60, birdY, 24, 24);
+            }, 30);
+            window.onkeydown = (e) => { if (e.code==='Space') velocity = -7; };
+          } else if (id === 'tictactoe') {
+            frame.innerHTML = `
+              <div style="text-align:center;">
+                <h3 id="tttStatus" style="margin-bottom:15px;">Your Turn (X)</h3>
+                <div id="tttBoard" style="display:grid; grid-template-columns:repeat(3, 80px); gap:8px; justify-content:center;"></div>
+              </div>
+            `;
+            let board = ["","","","","","","","",""];
+            const boardDiv = document.getElementById('tttBoard');
+            function renderTTT() {
+              boardDiv.innerHTML = '';
+              board.forEach((val, idx) => {
+                const btn = document.createElement('button');
+                btn.style.width = '80px'; btn.style.height = '80px'; btn.style.fontSize = '2rem';
+                btn.style.background = '#1e293b'; btn.style.border = '1px solid #374151'; btn.style.color = '#38bdf8';
+                btn.textContent = val;
+                btn.onclick = () => playTTT(idx);
+                boardDiv.appendChild(btn);
+              });
+            }
+            function playTTT(i) {
+              if (board[i] === "") {
+                board[i] = "X";
+                const empty = board.map((v, idx) => v === "" ? idx : null).filter(v => v !== null);
+                if (empty.length > 0) {
+                  const rand = empty[Math.floor(Math.random() * empty.length)];
+                  board[rand] = "O";
+                }
+                renderTTT();
+              }
+            }
+            renderTTT();
+          } else if (id === 'whackamole') {
+            frame.innerHTML = `
+              <div style="text-align:center;">
+                <h3 id="moleScore">Moles Whacked: 0</h3>
+                <button id="moleBtn" onclick="whack()" style="padding:20px 30px; font-size:2rem; background:#d97706; border:none; border-radius:12px; cursor:pointer;">🔨 Whack!</button>
+              </div>
+            `;
+            window.moles = 0;
+            window.whack = function() {
+              window.moles++;
+              document.getElementById('moleScore').textContent = "Moles Whacked: " + window.moles;
+            };
+          } else if (id === 'reactiontest') {
+            frame.innerHTML = `
+              <div id="reactBox" onclick="testReact()" style="width:300px; height:200px; background:#ef4444; border-radius:12px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.2rem; font-weight:bold;">
+                Wait for Green...
+              </div>
+            `;
+            let startTime = 0;
+            let ready = false;
+            const box = document.getElementById('reactBox');
+            setTimeout(() => {
+              box.style.background = '#22c55e';
+              box.textContent = 'CLICK NOW!';
+              startTime = Date.now();
+              ready = true;
+            }, Math.random() * 2000 + 1500);
+            window.testReact = function() {
+              if (ready) {
+                const diff = Date.now() - startTime;
+                box.textContent = 'Time: ' + diff + ' ms!';
+              } else {
+                box.textContent = 'Too early!';
+              }
+            };
+          } else {
+            frame.innerHTML = `
+              <div style="text-align:center;">
+                <h3 id="gameScore">Score: 0</h3>
+                <div id="targetArea" style="width: 320px; height: 260px; background: #1e293b; position: relative; margin: 0 auto; border-radius: 12px; cursor: crosshair;">
+                  <div id="activeTarget" onclick="hitGenericTarget()" style="width: 40px; height: 40px; background: #38bdf8; border-radius: 50%; position: absolute; top: 100px; left: 140px; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">${selected.icon}</div>
+                </div>
+              </div>
+            `;
+            window.gScore = 0;
+            window.hitGenericTarget = function() {
+              window.gScore++;
+              document.getElementById('gameScore').textContent = "Score: " + window.gScore;
+              const t = document.getElementById('activeTarget');
+              t.style.top = Math.floor(Math.random() * 200) + 'px';
+              t.style.left = Math.floor(Math.random() * 260) + 'px';
+            };
+          }
+        }
+
+        function closeGame() {
+          document.getElementById('gameOverlay').classList.remove('active');
+          document.getElementById('arcadeFrame').innerHTML = '';
+          if (window.gameInterval) clearInterval(window.gameInterval);
+          window.onkeydown = null;
+        }
+
+        function saveProgress() {
+          alert('Adventurerice progress saved!');
+          toggleMenu();
+        }
+
+        function resetProgress() {
+          if (confirm('Reset portal settings?')) {
+            alert('Progress reset.');
+            toggleMenu();
+          }
+        }
+
+        renderGames();
+        ]]>
+      </script>
+    </div>
+  </foreignObject>
+</svg>
