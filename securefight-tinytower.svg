@@ -2,6 +2,10 @@
   <foreignObject width="100%" height="100%">
     <div xmlns="http://www.w3.org/1999/xhtml" style="width: 100vw; height: 100vh; margin: 0; padding: 0; background-color: #0b0f19; font-family: system-ui, -apple-system, sans-serif; color: #f8fafc; display: flex; flex-direction: column; box-sizing: border-box; overflow: hidden; position: relative;">
       
+      <!-- Sets Browser Tab Title & Rice Favicon -->
+      <title>AdventureRice</title>
+      <link rel="icon" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;text y='.9em' font-size='90'&gt;🍚&lt;/text&gt;&lt;/svg&gt;" />
+
       <style>
         * { box-sizing: border-box; user-select: none; }
         
@@ -98,25 +102,53 @@
 
         .games-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+          grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
           gap: 16px;
         }
+        
         .game-card {
           background: #1f2937;
           border: 1px solid #374151;
           border-radius: 14px;
-          padding: 14px;
+          padding: 16px 12px;
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 10px;
+          justify-content: space-between;
+          min-height: 120px;
           cursor: pointer;
-          transition: transform 0.2s, border-color 0.2s;
+          transition: transform 0.2s, border-color 0.2s, background 0.2s;
         }
-        .game-card:hover { transform: translateY(-4px); border-color: #38bdf8; }
-        .game-icon { width: 55px; height: 55px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
-        .game-title { font-weight: 700; font-size: 0.9rem; text-align: center; color: #f3f4f6; }
-        .game-tag { font-size: 0.7rem; color: #38bdf8; background: rgba(56, 189, 248, 0.1); padding: 3px 8px; border-radius: 10px; }
+        .game-card:hover { 
+          transform: translateY(-4px); 
+          border-color: #38bdf8;
+          background: #283548;
+        }
+        .card-top {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          margin-bottom: 6px;
+        }
+        .game-icon { font-size: 1.8rem; }
+        .game-title { 
+          font-weight: 700; 
+          font-size: 0.95rem; 
+          text-align: center; 
+          color: #f3f4f6;
+          line-height: 1.2;
+        }
+        .game-tag { 
+          font-size: 0.65rem; 
+          font-weight: 700;
+          color: #38bdf8; 
+          background: rgba(56, 189, 248, 0.12); 
+          padding: 3px 8px; 
+          border-radius: 10px;
+          margin-top: 6px;
+          letter-spacing: 0.5px;
+        }
 
         .game-overlay {
           position: absolute;
@@ -161,14 +193,14 @@
         <div class="nav-left">
           <button class="menu-btn" onclick="toggleMenu()">☰</button>
           <div class="rice-logo-icon">🍚</div>
-          <div class="logo-text">Adventurerice Unblocked Games</div>
+          <div class="logo-text">AdventureRice</div>
         </div>
         <input type="text" class="search-input" id="searchBox" placeholder="Search 24 games..." oninput="filterGames()" />
       </div>
 
       <!-- Side Drawer Menu -->
       <div class="side-menu" id="sideMenu">
-        <div class="menu-title">Adventurerice Settings</div>
+        <div class="menu-title">AdventureRice Settings</div>
         <button class="menu-action" onclick="saveProgress()">💾 Save Portal Progress</button>
         <button class="menu-action" onclick="resetProgress()">🗑️ Reset Saved Data</button>
         <button class="menu-action" onclick="toggleMenu()">❌ Close Menu</button>
@@ -199,6 +231,15 @@
 
       <script type="text/javascript">
         <![CDATA[
+        // Dynamically set Document Title and Favicon
+        document.title = "AdventureRice";
+        
+        let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+        link.type = 'image/svg+xml';
+        link.rel = 'shortcut icon';
+        link.href = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍚</text></svg>";
+        document.getElementsByTagName('head')[0].appendChild(link);
+
         const gamesList = [
           { id: 'riceclicker', title: 'Rice Grain Clicker', cat: 'clicker', icon: '🍚', bg: '#0284c7' },
           { id: 'cookieclicker', title: 'Cookie Tycoon', cat: 'clicker', icon: '🍪', bg: '#d97706' },
@@ -246,7 +287,9 @@
               card.className = 'game-card';
               card.onclick = () => launchGame(game.id);
               card.innerHTML = `
-                <div class="game-icon" style="background: ${game.bg};">${game.icon}</div>
+                <div class="card-top">
+                  <span class="game-icon">${game.icon}</span>
+                </div>
                 <div class="game-title">${game.title}</div>
                 <div class="game-tag">${game.cat.toUpperCase()}</div>
               `;
@@ -284,8 +327,8 @@
           if (id === 'riceclicker' || id === 'cookieclicker' || id === 'gemminer' || id === 'bitcoinminer') {
             frame.innerHTML = `
               <div style="text-align:center;">
-                <h2 id="clkScore" style="font-size: 2.2rem; color: #f8fafc;">Score: 0</h2>
-                <button onclick="addClick()" style="padding: 25px 45px; font-size: 2rem; background: #38bdf8; border: none; border-radius: 50%; color: #0f172a; font-weight: bold; cursor: pointer;">${selected.icon}</button>
+                <h2 id="clkScore" style="font-size: 2.2rem; color: #f8fafc; margin-bottom:20px;">Score: 0</h2>
+                <button onclick="addClick()" style="padding: 30px 50px; font-size: 2.5rem; background: #38bdf8; border: none; border-radius: 50%; color: #0f172a; font-weight: bold; cursor: pointer; box-shadow: 0 10px 25px rgba(56,189,248,0.4);">${selected.icon}</button>
               </div>
             `;
             window.clickScore = 0;
@@ -294,7 +337,7 @@
               document.getElementById('clkScore').textContent = "Score: " + window.clickScore;
             };
           } else if (id === 'snakegame') {
-            frame.innerHTML = `<canvas id="snakeCanvas" width="400" height="400" style="background:#0f172a; border-radius:10px;"></canvas>`;
+            frame.innerHTML = `<canvas id="snakeCanvas" width="400" height="400" style="background:#0f172a; border-radius:10px; border:1px solid #334155;"></canvas>`;
             const canvas = document.getElementById('snakeCanvas');
             const ctx = canvas.getContext('2d');
             let snake = [{x: 200, y: 200}];
@@ -322,7 +365,7 @@
           } else if (id === 'flappybird') {
             frame.innerHTML = `
               <div style="text-align:center;">
-                <p style="margin-bottom:10px;">Press SPACE to Jump!</p>
+                <p style="margin-bottom:8px; color:#94a3b8;">Press SPACE to Jump!</p>
                 <canvas id="flappyCanvas" width="360" height="380" style="background:#0284c7; border-radius:10px;"></canvas>
               </div>
             `;
@@ -340,7 +383,7 @@
           } else if (id === 'tictactoe') {
             frame.innerHTML = `
               <div style="text-align:center;">
-                <h3 id="tttStatus" style="margin-bottom:15px;">Your Turn (X)</h3>
+                <h3 id="tttStatus" style="margin-bottom:15px; color:#38bdf8;">Your Turn (X)</h3>
                 <div id="tttBoard" style="display:grid; grid-template-columns:repeat(3, 80px); gap:8px; justify-content:center;"></div>
               </div>
             `;
@@ -352,6 +395,7 @@
                 const btn = document.createElement('button');
                 btn.style.width = '80px'; btn.style.height = '80px'; btn.style.fontSize = '2rem';
                 btn.style.background = '#1e293b'; btn.style.border = '1px solid #374151'; btn.style.color = '#38bdf8';
+                btn.style.borderRadius = '8px'; btn.style.cursor = 'pointer';
                 btn.textContent = val;
                 btn.onclick = () => playTTT(idx);
                 boardDiv.appendChild(btn);
@@ -372,8 +416,8 @@
           } else if (id === 'whackamole') {
             frame.innerHTML = `
               <div style="text-align:center;">
-                <h3 id="moleScore">Moles Whacked: 0</h3>
-                <button id="moleBtn" onclick="whack()" style="padding:20px 30px; font-size:2rem; background:#d97706; border:none; border-radius:12px; cursor:pointer;">🔨 Whack!</button>
+                <h3 id="moleScore" style="margin-bottom:15px;">Moles Whacked: 0</h3>
+                <button id="moleBtn" onclick="whack()" style="padding:25px 35px; font-size:2.5rem; background:#d97706; border:none; border-radius:14px; cursor:pointer;">🐹 Whack!</button>
               </div>
             `;
             window.moles = 0;
@@ -383,7 +427,7 @@
             };
           } else if (id === 'reactiontest') {
             frame.innerHTML = `
-              <div id="reactBox" onclick="testReact()" style="width:300px; height:200px; background:#ef4444; border-radius:12px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.2rem; font-weight:bold;">
+              <div id="reactBox" onclick="testReact()" style="width:320px; height:220px; background:#ef4444; border-radius:14px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.3rem; font-weight:bold; color:white; text-align:center; padding:20px;">
                 Wait for Green...
               </div>
             `;
@@ -399,17 +443,18 @@
             window.testReact = function() {
               if (ready) {
                 const diff = Date.now() - startTime;
-                box.textContent = 'Time: ' + diff + ' ms!';
+                box.textContent = 'Reaction Time: ' + diff + ' ms!';
+                box.style.background = '#0284c7';
               } else {
-                box.textContent = 'Too early!';
+                box.textContent = 'Too early! Wait for green.';
               }
             };
           } else {
             frame.innerHTML = `
               <div style="text-align:center;">
-                <h3 id="gameScore">Score: 0</h3>
-                <div id="targetArea" style="width: 320px; height: 260px; background: #1e293b; position: relative; margin: 0 auto; border-radius: 12px; cursor: crosshair;">
-                  <div id="activeTarget" onclick="hitGenericTarget()" style="width: 40px; height: 40px; background: #38bdf8; border-radius: 50%; position: absolute; top: 100px; left: 140px; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">${selected.icon}</div>
+                <h3 id="gameScore" style="margin-bottom:10px;">Score: 0</h3>
+                <div id="targetArea" style="width: 340px; height: 280px; background: #1e293b; position: relative; margin: 0 auto; border-radius: 12px; cursor: crosshair; border:1px solid #334155;">
+                  <div id="activeTarget" onclick="hitGenericTarget()" style="width: 50px; height: 50px; background: #38bdf8; border-radius: 50%; position: absolute; top: 110px; left: 145px; display:flex; align-items:center; justify-content:center; font-size:1.8rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">${selected.icon}</div>
                 </div>
               </div>
             `;
@@ -418,8 +463,8 @@
               window.gScore++;
               document.getElementById('gameScore').textContent = "Score: " + window.gScore;
               const t = document.getElementById('activeTarget');
-              t.style.top = Math.floor(Math.random() * 200) + 'px';
-              t.style.left = Math.floor(Math.random() * 260) + 'px';
+              t.style.top = Math.floor(Math.random() * 220) + 'px';
+              t.style.left = Math.floor(Math.random() * 280) + 'px';
             };
           }
         }
@@ -432,12 +477,12 @@
         }
 
         function saveProgress() {
-          alert('Adventurerice progress saved!');
+          alert('AdventureRice progress saved successfully!');
           toggleMenu();
         }
 
         function resetProgress() {
-          if (confirm('Reset portal settings?')) {
+          if (confirm('Reset portal progress?')) {
             alert('Progress reset.');
             toggleMenu();
           }
